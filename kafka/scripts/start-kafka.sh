@@ -11,9 +11,8 @@
 # * ALLOW_DELETE_TOPICS: adds delete.topic.enable=true to server.properties
 
 # Configure advertised host/port if we run in helios
-if [ ! -z "$HELIOS_PORT_kafka" ]; then
-    ADVERTISED_HOST=`echo $HELIOS_PORT_kafka | cut -d':' -f 1 | xargs -n 1 dig +short | tail -n 1`
-    ADVERTISED_PORT=`echo $HELIOS_PORT_kafka | cut -d':' -f 2`
+if [ -z "$ADVERTISED_HOST" ]; then
+    ADVERTISED_HOST=`hostname -I | cut -d' ' -f 1`
 fi
 
 # Set the external host and port

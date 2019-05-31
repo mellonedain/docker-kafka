@@ -6,6 +6,8 @@ This repository provides everything you need to run Kafka in Docker.
 For convenience also contains a packaged proxy that can be used to get data from
 a legacy Kafka 7 cluster into a dockerized Kafka 8.
 
+Based on https://github.com/spotify/docker-kafka
+
 Why?
 ---
 The main hurdle of running Kafka in Docker is that it depends on Zookeeper.
@@ -32,54 +34,31 @@ export ZOOKEEPER=`docker-machine ip \`docker-machine active\``:2181
 kafka-console-consumer.sh --zookeeper $ZOOKEEPER --topic test
 ```
 
-Running the proxy
------------------
-
-Take the same parameters as the mellonedain/kafka image with some new ones:
- * `CONSUMER_THREADS` - the number of threads to consume the source kafka 7 with
- * `TOPICS` - whitelist of topics to mirror
- * `ZK_CONNECT` - the zookeeper connect string of the source kafka 7
- * `GROUP_ID` - the group.id to use when consuming from kafka 7
-
-```bash
-docker run -p 2181:2181 -p 9092:9092 \
-    --env ADVERTISED_HOST=`boot2docker ip` \
-    --env ADVERTISED_PORT=9092 \
-    --env CONSUMER_THREADS=1 \
-    --env TOPICS=my-topic,some-other-topic \
-    --env ZK_CONNECT=kafka7zookeeper:2181/root/path \
-    --env GROUP_ID=mymirror \
-    mellonedain/kafkaproxy
-```
-
-In the box
+Optional ENV variables
 ---
-* **mellonedain/kafka**
 
-  The docker image with both Kafka and Zookeeper. Built from the `kafka`
-  directory.
-
-* **mellonedain/kafkaproxy**
-
-  The docker image with Kafka, Zookeeper and a Kafka 7 proxy that can be
-  configured with a set of topics to mirror.
+* ADVERTISED_HOST: the external ip for the container, e.g. `docker-machine ip \`docker-machine active\``
+* ADVERTISED_PORT: the external port for Kafka, e.g. 9092
+* ZK_CHROOT: the zookeeper chroot that's used by Kafka (without / prefix), e.g. "kafka"
+* LOG_RETENTION_HOURS: the minimum age of a log file in hours to be eligible for deletion (default is 168, for 1 week)
+* LOG_RETENTION_BYTES: configure the size at which segments are pruned from the log, (default is 1073741824, for 1GB)
+* NUM_PARTITIONS: configure the default number of log partitions per topic
+* AUTO_CREATE_TOPICS: adds auto.create.topics.enable=true to server.properties
+* ALLOW_DELETE_TOPICS: adds delete.topic.enable=true to server.properties
 
 Public Builds
 ---
 
 https://registry.hub.docker.com/u/mellonedain/kafka/
 
-https://registry.hub.docker.com/u/mellonedain/kafkaproxy/
-
 Build from Source
 ---
 
     docker build -t mellonedain/kafka kafka/
-    docker build -t mellonedain/kafkaproxy kafkaproxy/
 
 Todo
 ---
 
-* Not particularily optimzed for startup time.
+* Not particularly optimized for startup time.
 * Better docs
 

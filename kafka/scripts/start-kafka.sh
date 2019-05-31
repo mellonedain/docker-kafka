@@ -7,6 +7,8 @@
 # * LOG_RETENTION_HOURS: the minimum age of a log file in hours to be eligible for deletion (default is 168, for 1 week)
 # * LOG_RETENTION_BYTES: configure the size at which segments are pruned from the log, (default is 1073741824, for 1GB)
 # * NUM_PARTITIONS: configure the default number of log partitions per topic
+# * AUTO_CREATE_TOPICS: adds auto.create.topics.enable=true to server.properties
+# * ALLOW_DELETE_TOPICS: adds delete.topic.enable=true to server.properties
 
 # Configure advertised host/port if we run in helios
 if [ ! -z "$HELIOS_PORT_kafka" ]; then
@@ -69,6 +71,12 @@ fi
 if [ ! -z "$AUTO_CREATE_TOPICS" ]; then
     echo "auto.create.topics.enable: $AUTO_CREATE_TOPICS"
     echo "auto.create.topics.enable=$AUTO_CREATE_TOPICS" >> $KAFKA_HOME/config/server.properties
+fi
+
+# Enable/disable topics deletion
+if [ ! -z "$ALLOW_DELETE_TOPICS" ]; then
+     echo "delete.topic.enable: $ALLOW_DELETE_TOPICS"
+     echo "delete.topic.enable=$ALLOW_DELETE_TOPICS" >> $KAFKA_HOME/config/server.properties
 fi
 
 # Run Kafka
